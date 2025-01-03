@@ -1,7 +1,7 @@
 import csv
 
-file_path = 'D:\\Knowledge from internship\\New folder (2)\\bmn66.csv'
-folder_write_path = 'D:\\Knowledge from internship\\Database Schemas\\bmn66\\'
+file_path = 'D:\\Knowledge from internship\\New folder (2)\\cdddb.csv'
+folder_write_path = 'D:\\Knowledge from internship\\Database Schemas\\cdddb\\'
 file_write_path = set()
 
 data_type = set()
@@ -47,9 +47,7 @@ for class_name in file_write_path:
             if line[0] == class_name:
                 attributes.append(line[1])
 
-                if line[2] == "datetime":
-                    datatypes.append("DateTime")
-                elif line[2] == "decimal":
+                if line[2] == "decimal":
                     datatypes.append("decimal")
                 elif line[2] == "longtext":
                     datatypes.append("string")
@@ -67,8 +65,6 @@ for class_name in file_write_path:
                     datatypes.append("double")
                 elif line[2] == "mediumtext":
                     datatypes.append("string")
-                elif line[2] == "date":
-                    datatypes.append("DateTime")
                 elif line[2] == "int":
                     datatypes.append("int")
                 elif line[2] == "mediumblob":
@@ -86,9 +82,15 @@ for class_name in file_write_path:
 
 
                 if line[3] == "YES":
-                    isNullable.append("?")
+                    if line[2] == "datetime" or line[2] == "date":
+                        isNullable.append("")
+                        datatypes.append("Nullable<DateTime>")
+                    else:
+                        isNullable.append("?")
                 elif line[3] == "NO":
                     isNullable.append("")
+                    if line[2] == "datetime" or line[2] == "date":
+                        datatypes.append("DateTime")
 
         
         with open(path, 'w') as file_cs:
@@ -104,3 +106,14 @@ for class_name in file_write_path:
             file_cs.write("}\n")
 
 
+
+"""
+SELECT 
+TABLE_NAME
+,COLUMN_NAME
+,DATA_TYPE
+,IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS 
+WHERE TABLE_SCHEMA = 'cdddb'
+order by TABLE_NAME, ORDINAL_POSITION;
+"""
