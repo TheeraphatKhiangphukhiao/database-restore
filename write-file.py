@@ -1,7 +1,7 @@
 import csv
 
-file_path = 'D:\\Knowledge from internship\\New folder (2)\\cdddb.csv'
-folder_write_path = 'D:\\Knowledge from internship\\Database Schemas\\cdddb\\'
+file_path = 'D:\\Knowledge from internship\\New folder (2)\\bmn66.csv'
+folder_write_path = 'D:\\Knowledge from internship\\Database Schemas\\bmn66\\'
 file_write_path = set()
 
 data_type = set()
@@ -42,6 +42,7 @@ for class_name in file_write_path:
         attributes = []
         datatypes = []
         isNullable = []
+        isPrimaryKey = []
 
         for line in csvFile:
             if line[0] == class_name:
@@ -92,6 +93,12 @@ for class_name in file_write_path:
                     if line[2] == "datetime" or line[2] == "date":
                         datatypes.append("DateTime")
 
+
+                if line[4] == "YES":
+                    isPrimaryKey.append("[Key]")
+                elif line[4] == "NO":
+                    isPrimaryKey.append("")
+
         
         with open(path, 'w') as file_cs:
             file_cs.write("namespace Digix.Standard.Model.Entity\n{\n")
@@ -100,6 +107,8 @@ for class_name in file_write_path:
             file_cs.write(f"    public partial class {class_name}\n")
             file_cs.write("    {\n")
             for i in range(len(attributes)):
+                if isPrimaryKey[i] == "[Key]":
+                    file_cs.write(f"        {isPrimaryKey[i]}\n")
                 file_cs.write(f"        public {datatypes[i]}{isNullable[i]} {attributes[i]} {{ get; set; }}\n")
 
             file_cs.write("    }\n")
@@ -116,4 +125,26 @@ TABLE_NAME
 FROM INFORMATION_SCHEMA.COLUMNS 
 WHERE TABLE_SCHEMA = 'cdddb'
 order by TABLE_NAME, ORDINAL_POSITION;
+"""
+
+
+"""
+SELECT 
+    c.TABLE_NAME,
+    c.COLUMN_NAME,
+    c.DATA_TYPE,
+    c.IS_NULLABLE,
+    CASE 
+        WHEN k.COLUMN_NAME IS NOT NULL THEN 'YES'
+        ELSE 'NO'
+    END AS IS_PRIMARY_KEY
+FROM INFORMATION_SCHEMA.COLUMNS c
+LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE k
+    ON c.TABLE_NAME = k.TABLE_NAME
+    AND c.COLUMN_NAME = k.COLUMN_NAME
+    AND k.CONSTRAINT_SCHEMA = c.TABLE_SCHEMA
+    AND k.CONSTRAINT_NAME = 'PRIMARY'
+WHERE c.TABLE_SCHEMA = 'bmn66'
+ORDER BY c.TABLE_NAME, c.ORDINAL_POSITION;
+
 """
